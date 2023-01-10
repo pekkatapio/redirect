@@ -1,5 +1,14 @@
 <?php
 
+  // Alustetaan pagestatus-muuttuja:
+  //  0 = etusivu
+  // -1 = virheellinen tunniste
+  // -2 = tietokantavirhe
+  $pagestatus = 0;
+
+  // Palvelun osoite
+  $baseurl = "https://neutroni.hayo.fi/~koodaaja/redirect/";
+
   // Määritellään tietokantayhteyden muodostamisessa
   // tarvittavat tiedot.
   $dsn = "mysql:host=localhost;" .
@@ -42,22 +51,83 @@
 
         // Taulusta ei löytynyt tunnistetta vastaavaa riviä,
         // tulostetaan virheilmoitus.
-        echo "Väärä tunniste :(";
+        $pagestatus = -1;
 
       }
 
     } catch (PDOException $e) {
       // Avaamisessa tapahtui virhe, tulostetaan virheilmoitus.
-      echo $e->getMessage();
+      $pagestatus = -2;
+      $error = $e->getMessage();
     }
-
-  } else {
-
-    // hash-parametrilla ei ole arvoa, tulostetaan käyttäjälle 
-    // esittelyteksti.
-    echo "Tämä on osoitteiden lyhentäjä. Odota maltilla, " .
-         "tänne tulee tulevaisuudessa lisää toiminnallisuutta.";
 
   }
 
 ?>
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Lyhentäjä</title>
+    <meta charset='UTF-8'>
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+  </head>
+  <body>
+    <div class='page'>
+      <header>
+        <h1>Lyhentäjä</h1>
+        <div>ällistyttävä osoitelyhentäjä</div>
+      </header>
+      <main>
+<?php
+  if ($pagestatus == 0) {
+?>
+        <div class='form'>
+          <p>Tällä palvelulla voit lyhentää pitkän osoitteen
+             lyhyeksi. Syötä alla olevaan kenttään pitkä osoite
+             ja paina nappia, saat käyttöösi lyhytosoitteen,
+             jota voit jakaa eteenpäin.</p>
+          <form action='' method='POST'>
+            <label for='url'>Syötä lyhennettävä osoite</label>
+            <div class='url'>
+              <input type='text' name='url'
+                     placeholder='tosi pitkä osoite'>
+              <input type='submit' name='shorten' value='lyhennä'>
+            </div>
+          </form>
+        </div>
+<?php
+  }
+
+  if ($pagestatus == -1) {
+?>
+        <div class='error'>
+          <h2>HUPSISTA!</h2>
+          <p>Näyttää siltä, että lyhytosoitetta ei löytynyt.
+             Ole hyvä ja tarkista antamasi osoite.</p>
+          <p>Voit tehdä <a href="<?=$baseurl?>">tällä
+             palvelulla</a> oman lyhytosoitteen.</p>
+        </div>
+<?php
+  }
+
+  if ($pagestatus == -2) {
+    ?>
+        <div class='error'>
+          <h2>NYT KÄVI HASSUSTI!</h2>
+          <p>Nostamme käden ylös virheen merkiksi,
+             palvelimellamme on pientä hässäkkää.
+             Ole hyvä ja kokeile myöhemmin uudelleen.</p>
+          <p>(virheilmoitus: <?=$error?>)</p>
+        </div>
+    <?php
+  }
+?>
+      </main>
+      <footer>
+        <hr>
+        &copy; Kurpitsa Solutions
+      </footer>
+    </div>
+  </body>
+</html>
