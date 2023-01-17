@@ -94,3 +94,13 @@ footer hr {
   border-top-right-radius: 0.25em;
   border-bottom-right-radius: 0.25em;
 }
+
+.code {
+  font-size: 120%;
+  font-weight: bold;
+  text-align: center;
+  padding: 0.25em;
+  border: 1px solid #2c698d;
+  border-radius: 0.25em;
+  background-color: #f0f0f0;
+}
